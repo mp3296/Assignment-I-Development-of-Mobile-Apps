@@ -23,20 +23,7 @@ In the output, you'll find options to open the app in a
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **src** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Scope of the Project
-
-This project is a debugging task for Assignment I of the Development of Mobile Applications module. The goal is to validate the research by applying debugging processes to a selected React Native code block. The `App.jsx` file contains errors that need to be fixed and documented.
-
-## Running the Project
-
-To run the project in the browser, follow these steps:
-
-1. **Navigate to the project directory**:
-   ```sh
-   cd react-native-debug-challenge
-   ```
+You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
 ## Get a fresh project
 
