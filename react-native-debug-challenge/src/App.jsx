@@ -3,9 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity, // Fixed: Corrected TouchableOpac to TouchableOpacity
+  TouchableOpacity, // Error: VS Code  underline this as an undefined component: 'TouchableOpac' is declared but its value is never read.ts(6133)" This should be TouchableOpacity. 
   TextInput,
   FlatList,
+  // Picker, // Warning: Picker is deprecated and might be flagged by VS Code. Consider using a different component like a dropdown from a library.
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,23 +18,14 @@ const App = () => {
   const [firstName, setFirstName] = useState('');
   const [surname, setSurname] = useState('');
   const [age, setAge] = useState('');
-  const [gender, setGender] = useState('Male'); // Fixed: Added setGender to manage the gender state
-  const genderOptions = [
-    { value: 'Male', label: 'Male' },
-    { value: 'Female', label: 'Female' },
-    { value: 'Other', label: 'Other' },
-  ];
+  const [gender] = useState('Male'); // Warning: This state is not settable. VS Code might not flag this, but it should be useState('Male').
 
   // Load data from AsyncStorage when the app starts
   useEffect(() => {
     const loadData = async () => {
-      try {
-        const savedData = await AsyncStorage.getItem('userData');
-        if (savedData) {
-          setData(JSON.parse(savedData));
-        }
-      } catch (error) {
-        Alert.alert('Error', 'Failed to load data');
+      const savedData = await AsyncStorage.getItem('userData');
+      if (savedData) {
+        setData(JSON.parse(savedData));
       }
     };
     loadData();
@@ -41,34 +33,33 @@ const App = () => {
 
   // Save data to AsyncStorage whenever the data state changes
   useEffect(() => {
-    const saveData = async () => {
-      try {
-        await AsyncStorage.setItem('userData', JSON.stringify(data));
-      } catch (error) {
-        Alert.alert('Error', 'Failed to save data');
-      }
-    };
-    saveData();
+    AsyncStorage.setItem('userData', JSON.stringify(data)); // Warning: AsyncStorage.setItem does not handle errors. Consider adding a try-catch block.
   }, [data]);
 
   // Function to handle adding new data
   const addData = () => {
-    if (firstName && surname && age && gender) {
+    if (firstName && surname && age && gender) { // Warning: gender might not be settable as mentioned above.
       const newData = {
         id: Date.now().toString(),
         firstName: firstName.trim(),
         surname: surname.trim(),
         age: age.trim(),
-        gender,
+        gender, // Warning: This might be flagged if gender is not settable as mentioned above.
       };
       setData([...data, newData]);
-      // Clear input fields
+      
+      // console.log('Please fill in all fields.');
+      
+   
+// Clear input fields
       setFirstName('');
       setSurname('');
       setAge('');
       setGender('Male');
+      document.title = "User Information Manager"; // Reset tab title if no errors
     } else {
-      Alert.alert('Error', 'Please fill in all fields.');
+      Alert.alert('Error', 'Please fill all fields'); // Warning: This might not be flagged, but it's good practice to handle empty fields with alert messages rather than logging to the console.
+      document.title = "Error: Please fill all fields"; // Set tab title to error message
     }
   };
 
@@ -80,9 +71,10 @@ const App = () => {
 
   // Function to display item details
   const handleClick = (item) => {
-    Alert.alert(
+    console.log(
       'Details',
-      `Name: ${item.firstName} ${item.surname}\nAge: ${item.age}\nGender: ${item.gender}`
+      `Name: ${item.firstNames} ${item.surnames}\nAge: ${item.ages}\nGender: ${item.genders}`
+    // Error: Missing backticks for template literals. VS Code will likely highlight this as a syntax error.
     );
   };
 
@@ -101,7 +93,9 @@ const App = () => {
         style={styles.input}
         placeholder="Surname"
         value={surname}
-        onChangeText={setSurname}
+        onChangeText={setSurname} // changed from onChangeText-{setSurname}, VS code hiughlighted it as an error
+     
+
       />
       <TextInput
         style={styles.input}
@@ -110,23 +104,32 @@ const App = () => {
         onChangeText={setAge}
         keyboardType="numeric"
       />
-      <Select
-        value={genderOptions.find(option => option.value === gender)}
+      {/* <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={gender}
+          onValueChange={(itemValue) => setGender(itemValue)}
+          style={styles.picker}>
+          <Picker.Item label="Male" value="Male" />
+          <Picker.Item label="Female" value="Female" />
+          <Picker.Item label="Other" value="Other" />
+        </Picker>
+      </View> */}
+
+      <Select // Changed: Using react-select instead of Picker for web compatibility
+        value={{ label: gender, value: gender }}
         onChange={(selectedOption) => setGender(selectedOption.value)}
-        options={genderOptions}
-        styles={{
-          container: (provided) => ({
-            ...provided,
-            marginBottom: 10,
-          }),
-        }}
+        options={[
+          { label: 'Male', value: 'Male' },
+          { label: 'Female', value: 'Female' },
+          { label: 'Other', value: 'Other' },
+        ]}
       />
-      <TouchableOpacity style={styles.addButton} onPress={addData}>
-        <Text style={styles.addButtonText}>Add</Text>
-      </TouchableOpacity>
+      <TouchableOpacity style={styles.addButton} onPress={addData}> {/* Error: This should be TouchableOpacity. */}
+        <Text style={styles.addButtonText}>Add</Text> {/* Error: Missing closing tag for <Text>. */}
+      </TouchableOpacity> {/* Error: This should be TouchableOpacity and it needs a closing tag. */}
       <FlatList
         data={data}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.ID}
         renderItem={({ item }) => (
           <View style={styles.listItem}>
             <TouchableOpacity onPress={() => handleClick(item)}>
@@ -167,6 +170,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginBottom: 10,
   },
+//   pickerContainer: {
+//     borderWidth: 1,
+//     borderColor: '#ccc',
+//     borderRadius: 5,
+//     marginBottom: 10,
+//     backgroundColor: '#fff',
+//   },
+//   picker: {
+//     height: 50,
+//     width: '100%',
+//   },
+// changed from picker to select
+selectContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+},
+select: {
+    height: 50,
+    width: '100%',
+},
   addButton: {
     backgroundColor: '#4caf50',
     padding: 10,
