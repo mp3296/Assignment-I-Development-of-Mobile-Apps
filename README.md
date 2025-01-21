@@ -1,1 +1,0 @@
-# Assignment-I-Development-of-Mobile-Apps

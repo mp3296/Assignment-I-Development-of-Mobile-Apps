@@ -3,13 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpac,
+  TouchableOpacity, // Error: VS Code  underline this as an undefined component: 'TouchableOpac' is declared but its value is never read.ts(6133)" This should be TouchableOpacity. 
   TextInput,
   FlatList,
-  Picker,
+  // Picker, // Warning: Picker is deprecated and might be flagged by VS Code. Consider using a different component like a dropdown from a library.
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Select from 'react-select'; // Changed: Using react-select instead of Picker for web compatibility
 
 const App = () => {
   // States to manage form inputs and data
@@ -17,7 +18,7 @@ const App = () => {
   const [firstName, setFirstName] = useState('');
   const [surname, setSurname] = useState('');
   const [age, setAge] = useState('');
-  const [gender] = useState('Male');
+  const [gender] = useState('Male'); // Warning: This state is not settable. VS Code might not flag this, but it should be useState('Male').
 
   // Load data from AsyncStorage when the app starts
   useEffect(() => {
@@ -32,28 +33,33 @@ const App = () => {
 
   // Save data to AsyncStorage whenever the data state changes
   useEffect(() => {
-    AsyncStorage.setItem('userData', JSON.stringify(data));
+    AsyncStorage.setItem('userData', JSON.stringify(data)); // Warning: AsyncStorage.setItem does not handle errors. Consider adding a try-catch block.
   }, [data]);
 
   // Function to handle adding new data
   const addData = () => {
-    if (firstName && surname && age && gender) {
+    if (firstName && surname && age && gender) { // Warning: gender might not be settable as mentioned above.
       const newData = {
         id: Date.now().toString(),
         firstName: firstName.trim(),
         surname: surname.trim(),
         age: age.trim(),
-        gender,
+        gender, // Warning: This might be flagged if gender is not settable as mentioned above.
       };
       setData([...data, newData]);
       
-      console.log('Please fill in all fields.');
-    } else {
+      // console.log('Please fill in all fields.');
+      
+   
 // Clear input fields
       setFirstName('');
       setSurname('');
       setAge('');
       setGender('Male');
+      document.title = "User Information Manager"; // Reset tab title if no errors
+    } else {
+      Alert.alert('Error', 'Please fill all fields'); // Warning: This might not be flagged, but it's good practice to handle empty fields with alert messages rather than logging to the console.
+      document.title = "Error: Please fill all fields"; // Set tab title to error message
     }
   };
 
@@ -67,7 +73,8 @@ const App = () => {
   const handleClick = (item) => {
     console.log(
       'Details',
-      Name: ${item.firstNames} ${item.surnames}\nAge: ${item.ages}\nGender: ${item.genders}
+      `Name: ${item.firstNames} ${item.surnames}\nAge: ${item.ages}\nGender: ${item.genders}`
+    // Error: Missing backticks for template literals. VS Code will likely highlight this as a syntax error.
     );
   };
 
@@ -86,7 +93,9 @@ const App = () => {
         style={styles.input}
         placeholder="Surname"
         value={surname}
-        onChangeText-{setSurname}
+        onChangeText={setSurname} // changed from onChangeText-{setSurname}, VS code hiughlighted it as an error
+     
+
       />
       <TextInput
         style={styles.input}
@@ -95,7 +104,7 @@ const App = () => {
         onChangeText={setAge}
         keyboardType="numeric"
       />
-      <View style={styles.pickerContainer}>
+      {/* <View style={styles.pickerContainer}>
         <Picker
           selectedValue={gender}
           onValueChange={(itemValue) => setGender(itemValue)}
@@ -104,10 +113,20 @@ const App = () => {
           <Picker.Item label="Female" value="Female" />
           <Picker.Item label="Other" value="Other" />
         </Picker>
-      </View>
-      <TouchableOpac style={styles.addButton} onPress={addData}>
-        <Text style={styles.addButtonText}>Add<Text>
-      </TouchableOpacity>
+      </View> */}
+
+      <Select // Changed: Using react-select instead of Picker for web compatibility
+        value={{ label: gender, value: gender }}
+        onChange={(selectedOption) => setGender(selectedOption.value)}
+        options={[
+          { label: 'Male', value: 'Male' },
+          { label: 'Female', value: 'Female' },
+          { label: 'Other', value: 'Other' },
+        ]}
+      />
+      <TouchableOpacity style={styles.addButton} onPress={addData}> {/* Error: This should be TouchableOpacity. */}
+        <Text style={styles.addButtonText}>Add</Text> {/* Error: Missing closing tag for <Text>. */}
+      </TouchableOpacity> {/* Error: This should be TouchableOpacity and it needs a closing tag. */}
       <FlatList
         data={data}
         keyExtractor={(item) => item.ID}
@@ -151,17 +170,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginBottom: 10,
   },
-  pickerContainer: {
+//   pickerContainer: {
+//     borderWidth: 1,
+//     borderColor: '#ccc',
+//     borderRadius: 5,
+//     marginBottom: 10,
+//     backgroundColor: '#fff',
+//   },
+//   picker: {
+//     height: 50,
+//     width: '100%',
+//   },
+// changed from picker to select
+selectContainer: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
     marginBottom: 10,
     backgroundColor: '#fff',
-  },
-  picker: {
+},
+select: {
     height: 50,
     width: '100%',
-  },
+},
   addButton: {
     backgroundColor: '#4caf50',
     padding: 10,
