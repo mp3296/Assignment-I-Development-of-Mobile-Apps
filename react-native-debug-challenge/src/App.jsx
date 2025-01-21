@@ -6,7 +6,6 @@ import {
   TouchableOpacity, // Error: VS Code  underline this as an undefined component: 'TouchableOpac' is declared but its value is never read.ts(6133)" This should be TouchableOpacity. 
   TextInput,
   FlatList,
-  // Picker, // Warning: Picker is deprecated and might be flagged by VS Code. Consider using a different component like a dropdown from a library.
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,7 +17,7 @@ const App = () => {
   const [firstName, setFirstName] = useState('');
   const [surname, setSurname] = useState('');
   const [age, setAge] = useState('');
-  const [gender] = useState('Male'); // Warning: This state is not settable. VS Code might not flag this, but it should be useState('Male').
+  const [gender, setGender] = useState('Male'); // Warning: This state is not settable, it should be setGender.
 
   // Load data from AsyncStorage when the app starts
   useEffect(() => {
@@ -31,10 +30,22 @@ const App = () => {
     loadData();
   }, []);
 
-  // Save data to AsyncStorage whenever the data state changes
+  // // Save data to AsyncStorage whenever the data state changes
+  // useEffect(() => {
+  //   AsyncStorage.setItem('userData', JSON.stringify(data)); // Warning: AsyncStorage.setItem does not handle errors, add a try-catch block.
+  // }, [data]);
+
+// Save data to AsyncStorage whenever the data state changes
   useEffect(() => {
-    AsyncStorage.setItem('userData', JSON.stringify(data)); // Warning: AsyncStorage.setItem does not handle errors. Consider adding a try-catch block.
-  }, [data]);
+    const saveData = async () => {
+      try {
+        await AsyncStorage.setItem('userData', JSON.stringify(data));
+      } catch (error) {
+        console.error('Failed to save data to AsyncStorage', error);
+      }
+    };
+    saveData();
+}, [data]);
 
   // Function to handle adding new data
   const addData = () => {
@@ -74,7 +85,7 @@ const App = () => {
     console.log(
       'Details',
       `Name: ${item.firstNames} ${item.surnames}\nAge: ${item.ages}\nGender: ${item.genders}`
-    // Error: Missing backticks for template literals. VS Code will likely highlight this as a syntax error.
+    // Error: Missing backticks for template literals. VS Code highlighted this as a syntax error.
     );
   };
 
@@ -126,10 +137,10 @@ const App = () => {
       />
       <TouchableOpacity style={styles.addButton} onPress={addData}> {/* Error: This should be TouchableOpacity. */}
         <Text style={styles.addButtonText}>Add</Text> {/* Error: Missing closing tag for <Text>. */}
-      </TouchableOpacity> {/* Error: This should be TouchableOpacity and it needs a closing tag. */}
+      </TouchableOpacity> {/* Error: This should be TouchableOpacity. */}
       <FlatList
         data={data}
-        keyExtractor={(item) => item.ID}
+        keyExtractor={(item) => item.id} // Changed to lowercase 'id'
         renderItem={({ item }) => (
           <View style={styles.listItem}>
             <TouchableOpacity onPress={() => handleClick(item)}>
